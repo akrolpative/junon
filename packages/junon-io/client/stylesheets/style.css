@@ -8682,8 +8682,8 @@ body.imposter_mode .minigame_poster {
     padding: 2px 5px;
 }
 
-.function_table tbody {
-    display: initial;
+.function_table tbody tr td {
+    width: 30%;
 }
 
 .function_table button {
