@@ -1411,8 +1411,15 @@ class EventHandler {
 
   getValueLength(...values) {
     if (values.length === 0) return 0;
-    let string = values[0].toString().length;
-    return string;
+    let string = values[0].toString();
+    return string.length;
+  }
+
+  getValueCount(...values) {
+    if (values.length < 2) return 0;
+    let value = values[0].toString() || ' ';
+    let string = values[1].toString();
+    return string.split(value).length - 1;
   }
 
   getPushedValue(...values) {
@@ -1604,6 +1611,7 @@ class EventHandler {
       "$getRemovedValue": true,
       "$getDate": true,
       "$getEntityDistance": true,
+      "$getValueCount": true,
     }
   }
 

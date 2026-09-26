@@ -7,8 +7,10 @@ class Setting extends BaseCommand {
     return [
       "Configures the settings of the colony",
       "/setting [key] [value]",
-     "Guide: https://pastebin.com/raw/4jsmPjws",
+     "Available [true|false] keys: " + Object.keys(this.sector.settings).join(", "),
+     "Available keys: " + this.getAllowedExtraSettings().join(", "),
       "ex: /setting isChatEnabled false",
+      "/setting lighting 23",
     ]
   }
 
@@ -20,6 +22,10 @@ class Setting extends BaseCommand {
     return true
   }
 
+  getAllowedExtraSettings() {
+    return ['buildSpeed [1-5]', 'miningSpeed [1-5]', 'lighting [0-100]']
+  }
+
   perform(player, args) {
     let key = args[0]
     let value = args[1]
@@ -29,6 +35,8 @@ class Setting extends BaseCommand {
       if (value > 0 && value <= 5) {
         this.sector.setBuildSpeed(value)
         player.showChatSuccess("buildSpeed set to " + value)
+      } else {
+        player.showChatError("Invalid value. Values from 0 - 5 accepted only.")
       }
       return
     }
@@ -38,28 +46,30 @@ class Setting extends BaseCommand {
       if (value > 0 && value <= 5) {
         this.sector.setMiningSpeed(value)
         player.showChatSuccess("miningSpeed set to " + value)
+      } else {
+        player.showChatError("Invalid value. Values from 0 - 5 accepted only.")
       }
       return
     }
 
     if (key === 'lighting') {
       value = parseInt(value)
-      if (value > 50 && value <= 100) {
+      if (value >= 0 && value <= 100) {
         this.game.isLightingCustom = value
         player.showChatSuccess("lighting set to " + value)
       } else {
-        this.game.isLightingCustom = 0
+        player.showChatError("Invalid value. Values from 0 - 100 accepted only.")
       }
       return
     }
 
     if (!this.sector.settings.hasOwnProperty(key)) {
-      player.showChatError("invalid key. Valid keys are: " + Object.keys(this.sector.settings).join(", "))
+      player.showChatError("Invalid key. Valid keys are: " + Object.keys(this.sector.settings).join(", "))
       return
     }
 
     if (["true", "false"].indexOf(value) === -1) {
-      player.showChatError("invalid value. true/false accepted only")
+      player.showChatError("Invalid value. true/false accepted only.")
       return
     }
 
