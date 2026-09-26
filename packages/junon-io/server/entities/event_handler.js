@@ -1402,9 +1402,14 @@ class EventHandler {
     let targetIndex = parseInt(values[0]);
     let value = values[1].toString();
     let string = values[2].toString();
+    let mode = values[3] ? values[3].toString() : values[3];
     while (index < targetIndex) {
       returnIndex = string.indexOf(value, returnIndex) + value.length;
       index += 1;
+    }
+
+    if (mode === 'w') {
+      return this.convertIndex(returnIndex - value.length + 1, string, 'l', 'w');
     }
     return returnIndex - value.length + 1;
   }
@@ -1434,8 +1439,44 @@ class EventHandler {
     if (values.length < 3) return undefined;
     let value = values[1].toString();
     let string = values[2].toString();
-    let startIndex = this.getValuePosition(...values) - 1;
+    let startIndex = this.getValuePosition(values[0], values[1], values[2]) - 1;
     return string.slice(0,startIndex) + string.slice(startIndex + value.length);
+  }
+
+  replaceValue(...values) {
+    if (values.length < 3) return undefined;
+    let index = values[0].toString();
+    let replaceValue = values[1].toString();
+    let insertValue = values[2].toString();
+    let string = values[3].toString();
+    return string.slice(0, index) + string.slice(index).replaceAll(replaceValue, insertValue);
+  }
+
+  convertIndex(...values) {
+    if (values.length < 4) return undefined;
+    const acceptedConversions = [
+      'l',
+      'w',
+    ];
+    let index = parseInt(values[0]);
+    let string = values[1].toString();
+    let convertFrom = values[2].toString();
+    let convertTo = values[3].toString();
+    if (acceptedConversions.indexOf(convertFrom) == -1 || acceptedConversions.indexOf(convertTo) == -1) {
+      return undefined;
+    }
+    if (convertFrom == convertTo) {
+      return index;
+    }
+    if (convertFrom == 'l' && convertTo == 'w') {
+      return string.slice(0, index).split(" ").length;
+    }else if(convertFrom == 'w' && convertTo == 'l') {
+      let letterLength = 0;
+      string.split(" ").slice(0, index - 1).forEach((element) => 
+        letterLength += element.length + 1
+      );
+      return letterLength + 1;
+    }
   }
 
   getDate(...values) {
@@ -1612,6 +1653,8 @@ class EventHandler {
       "$getDate": true,
       "$getEntityDistance": true,
       "$getValueCount": true,
+      "$replaceValue": true,
+      "$convertIndex": true,
     }
   }
 
