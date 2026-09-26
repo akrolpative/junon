@@ -3,19 +3,27 @@ const SceneAction = require("./scene_action")
 const Constants = require('../../common/constants.json')
 
 class Scene {
-  constructor(game, name) {
+  constructor(game, name,options) {
     this.game = game
     this.name = name
     this.sector = game.sector
 
     this.timeline = {}
     this.seconds = 0
+    this.setDuration(this.seconds)
+    this.entityToPoint = options.entityId
 
+    console.log(options.duration)
     this.register()
   }
 
   getSocketUtil() {
     return this.game.server.socketUtil
+  }
+
+  setScene(options) {
+    this.seconds = options.duration
+    this.entityToPoint = options.entityId
   }
 
   setCamera(object) {
@@ -41,6 +49,7 @@ class Scene {
     this.timeline[options.secondsTimestamp][action.id] = action
   }
 
+
   rename(name) {
     if (this.game.scenes[name]) return
 
@@ -64,6 +73,7 @@ class Scene {
   }
 
   play(options = {}) {
+
     this.origFovMode = this.sector.settings["isFovMode"]
     this.sector.editSetting("isFovMode", false)
 
@@ -73,10 +83,16 @@ class Scene {
         this.camera = entity
       } else {
         let row = parseInt(options.camera.split("-")[0])
-        let col = parseInt(options.camera.split("-")[1])
+        let col = parseInt(options.camera.split("-")[1]) 
         if (!isNaN(row) && !isNaN(col) && !this.sector.isOutOfBounds(row, col)) {
           this.camera = { row: row, col: col, isPositionBased: true }
         }
+      }
+    } else {
+      let row = parseInt(this.entityToPoint.getRow())
+      let col = parseInt(this.entityToPoint.getCol())
+      if (!isNaN(row) && !isNaN(col) && !this.sector.isOutOfBounds(row, col)) {
+        this.camera = {row: row, col:col, isPositionBased: true}
       }
     }
 

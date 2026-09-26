@@ -221,7 +221,7 @@ class Game {
   }
 
   createScene(name, options = {}) {
-    let scene = new Scene(this, name)
+    let scene = new Scene(this, name, options)
     return scene
   }
 
