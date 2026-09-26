@@ -8,7 +8,7 @@ class Arrow extends BaseCommand {
     return [
       "Creates an around locked to the player that points to the specified direction",
       "/arrow set [arrow_id 1:30] [player] [point_to id/name]",
-      "/arrow set [arrow_id 1:30] [player] [point_to id/name] [color] [size 1:35] [tool_tip] [bg true:false]",
+      "/arrow set [arrow_id 1:50] [player] [point_to id/name] [color] [size 1:35] [tool_tip] [bg true:false]",
       "/arrow remove [arrow_id] [player]",
       "/arrow clear [player]",
       "ex: /arrow set 1 kuroro 1234 red 25 Slime false",
@@ -40,7 +40,7 @@ class Arrow extends BaseCommand {
     
     switch(subcommand) {
       case "set": 
-        if (!args[1] || parseInt(args[1]) > 30 || parseInt(args[1]) < 1) {
+        if (!args[1] || parseInt(args[1]) > 50 || parseInt(args[1]) < 1) {
         caller.showChatError("Invalid Arrow ID")
           return
         }
@@ -58,7 +58,9 @@ class Arrow extends BaseCommand {
             color:args[4],
             size:Math.max(Math.min(parseInt(args[5]||"24"),35),1),
             tooltip:args[6],
-            isbg:args[7]
+            isbg:args[7],
+            col:entityById.getX(),
+            row:entityById.getY()
           }
         });
         break

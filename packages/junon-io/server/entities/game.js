@@ -48,11 +48,11 @@ class Game {
 
     if (!sectorData.id) {
       let sectorIdAndName = this.generateSectorIdName()
-      this.sectorUid  = this.id   = sectorIdAndName.id
+      this.sectorUid = this.id = sectorIdAndName.id
       this.sectorName = this.name = sectorIdAndName.name
     } else {
       this.origSectorUid = sectorData.origSectorUid
-      this.sectorUid  = this.id   = sectorData.id
+      this.sectorUid = this.id = sectorData.id
 
       let sectorName
       if (sectorData.name) {
@@ -333,7 +333,7 @@ class Game {
       let filePath = global.appRoot + "/client/assets/screenshots/" + key
       fs.writeFileSync(filePath, data)
       return true
-    } catch(e) {
+    } catch (e) {
       this.captureException(e)
       return false
     }
@@ -348,7 +348,7 @@ class Game {
 
       fs.unlinkSync(filePath)
       return true
-    } catch(e) {
+    } catch (e) {
       this.captureException(e)
       return false
     }
@@ -436,7 +436,7 @@ class Game {
   }
 
   generateSectorIdName() {
-    let randomNumber =  Math.random().toString().slice(2)
+    let randomNumber = Math.random().toString().slice(2)
     return {
       id: base64id.generateId(),
       name: "Sector " + randomNumber
@@ -675,15 +675,15 @@ class Game {
   cleanupLeavingPlayers() {
     if (this.leavingPlayerCount > 0)
 
-    for (let id in this.leavingPlayers) {
-      let leaveTimestamp = this.leavingPlayers[id]
-      let duration = this.timestamp - leaveTimestamp
-      if (duration > (Constants.physicsTimeStep * 5)) {
-        let player = this.players[id]
-        this.removeLeavingPlayer(player)
-        player.remove()
+      for (let id in this.leavingPlayers) {
+        let leaveTimestamp = this.leavingPlayers[id]
+        let duration = this.timestamp - leaveTimestamp
+        if (duration > (Constants.physicsTimeStep * 5)) {
+          let player = this.players[id]
+          this.removeLeavingPlayer(player)
+          player.remove()
+        }
       }
-    }
   }
 
   cleanupCharacterRestarts() {
@@ -734,7 +734,7 @@ class Game {
           delete this.reservedSpots[ip]
         }
       }
-    } catch(e) {
+    } catch (e) {
       this.captureException(e)
     }
   }
@@ -754,7 +754,7 @@ class Game {
           player.remove()
           delete this.disconnectedPlayers[playerId]
         }
-      } catch(e) {
+      } catch (e) {
         this.captureException(e)
       }
     }
@@ -787,7 +787,7 @@ class Game {
     if (player.team?.name !== teamName) {
       player.removeTeamMemberships()
     }
-    
+
     team.addMemberWithRole(player)
 
     return true
@@ -884,7 +884,7 @@ class Game {
       }
     }
 
-    new Lobby(this, sectorData.metadata, sectorData.entities )
+    new Lobby(this, sectorData.metadata, sectorData.entities)
   }
 
   convertLobbyBlueprintToSaveData(blueprintData) {
@@ -955,7 +955,7 @@ class Game {
 
     let isNewGame = !options.isBootSector && !options.isMiniGame
     if (false && isNewGame) {
-       let compressed = require("fs").readFileSync("/Users/reg/gamedev/junon/sector.sav.gz")
+      let compressed = require("fs").readFileSync("/Users/reg/gamedev/junon/sector.sav.gz")
       // let compressed = require("fs").readFileSync("/Users/reg/gamedev/junon/junon-io/amongus_3.sav.gz")
       let buffer = await this.decompressGzip(compressed)
       if (!buffer) return
@@ -1038,13 +1038,11 @@ class Game {
 
   triggerEvent(eventName, params = {}) {
     if (!this.isGameReady) return
-    try
-    {
+    try {
       this.sector && this.sector.eventHandler.trigger(eventName, params)
     }
-    catch(e)
-    {
-      if(e.name === "RangeError"){
+    catch (e) {
+      if (e.name === "RangeError") {
         // disable processing more triggers
         this.isGameReady = false
         throw new Error("possible lag machine detected")
@@ -1070,14 +1068,14 @@ class Game {
   hasTimer(name) {
     return this.timers[name]
   }
-  
+
   runTimers() {
     const isIntervalElapsed = this.timestamp % (Constants.physicsTimeStep / 20) === 0
     if (!isIntervalElapsed) return
-    
+
     for (let name in this.timers) {
       let timer = this.timers[name]
-      
+
       if (timer.elapsedFrames === undefined) {
         timer.tick = 0
         timer.elapsedFrames = 0
@@ -1130,30 +1128,30 @@ class Game {
     this.shouldPause = false
   }
 
-async setGameMode(gameMode) {
-  if (this.isMiniGame()) return
+  async setGameMode(gameMode) {
+    if (this.isMiniGame()) return
 
-  let allowedGameModes = ['peaceful', 'survival', 'hardcore']
-  if (allowedGameModes.indexOf(gameMode) === -1) return
-  if (this.gameMode === gameMode) return
+    let allowedGameModes = ['peaceful', 'survival', 'hardcore']
+    if (allowedGameModes.indexOf(gameMode) === -1) return
+    if (this.gameMode === gameMode) return
 
-  if (!this.gameMode || this.gameMode === 'default') {
-    await SectorModel.update({
-      gameMode: gameMode,
-    }, {
-      where: { uid: this.getSectorUid() }
-    })
+    if (!this.gameMode || this.gameMode === 'default') {
+      await SectorModel.update({
+        gameMode: gameMode,
+      }, {
+        where: { uid: this.getSectorUid() }
+      })
 
-    this.gameMode = gameMode
-    this.sector.setGameMode(gameMode)
+      this.gameMode = gameMode
+      this.sector.setGameMode(gameMode)
 
-    this.sector.initSettings()
-    this.getSocketUtil().broadcast(this.getSocketIds(), "SectorUpdated", {
-      gameMode: this.gameMode,
-      settings: this.sector.settings
-    })
+      this.sector.initSettings()
+      this.getSocketUtil().broadcast(this.getSocketIds(), "SectorUpdated", {
+        gameMode: this.gameMode,
+        settings: this.sector.settings
+      })
+    }
   }
-}
 
   isStale() {
     let twoMinutes = Date.now() - this.gameStartTime > (1000 * 60 * 2)
@@ -1204,7 +1202,7 @@ async setGameMode(gameMode) {
     let sector = this.sector
     let count = query ? parseInt(query.count) : 1
 
-    switch(message) {
+    switch (message) {
       case "memoryUsage":
         gc()
         console.log(process.memoryUsage())
@@ -1213,7 +1211,7 @@ async setGameMode(gameMode) {
       case "createWall":
         for (var i = 0; i < count; i++) {
           let ground = sector.findRandomGround()
-          Buildings.Wall.build({ x: ground.getX(), y: ground.getY() } , sector)
+          Buildings.Wall.build({ x: ground.getX(), y: ground.getY() }, sector)
         }
         break
       case "spawnMob":
@@ -1239,8 +1237,8 @@ async setGameMode(gameMode) {
   }
 
   getHourFromTimestamp(timestamp) {
-    const hoursPerSecond = 1/Constants.secondsPerHour
-    const secondsPerTick = 1/Constants.physicsTimeStep
+    const hoursPerSecond = 1 / Constants.secondsPerHour
+    const secondsPerTick = 1 / Constants.physicsTimeStep
 
     const beginningHour = 0
     return (Math.floor(timestamp * secondsPerTick * hoursPerSecond) + beginningHour) % 24
@@ -1357,7 +1355,7 @@ async setGameMode(gameMode) {
 
       // damping
       body.entity.dampenVelocity()
-    } catch(e) {
+    } catch (e) {
       this.captureException(e)
     }
   }
@@ -1491,8 +1489,8 @@ async setGameMode(gameMode) {
   }
 
   delay(time) {
-    return new Promise(function(resolve) {
-       setTimeout(resolve.bind(null), time)
+    return new Promise(function (resolve) {
+      setTimeout(resolve.bind(null), time)
     })
   }
 
@@ -1622,7 +1620,7 @@ async setGameMode(gameMode) {
       cb(this.sector.transports[id].body)
     }
 
-    for(let id in this.sector.buildings) {
+    for (let id in this.sector.buildings) {
       cb(this.sector.buildings[id].body)
     }
   }
@@ -1688,7 +1686,7 @@ async setGameMode(gameMode) {
   sendUpdates() {
     if (process.env.SIMULATE_LAG) {
       let minDelay = 200
-      let delay = Math.floor(Math.random() * 250) +  minDelay
+      let delay = Math.floor(Math.random() * 250) + minDelay
       setTimeout(this.sendUpdatesToClients.bind(this), delay)
     } else {
       this.sendUpdatesToClients()
@@ -1717,9 +1715,9 @@ async setGameMode(gameMode) {
     let memory = this.getStat("memory").usage
 
     // get player positions
-    for(let i in this.players) {
+    for (let i in this.players) {
       let player = this.players[i]
-      if(player.isReady() && player.shouldSendToClient()) {
+      if (player.isReady() && player.shouldSendToClient()) {
         if (player.lastServerMemory !== memory) {
           player.lastServerMemory = memory
           this.gameInfo["memory"] = memory
@@ -1729,12 +1727,12 @@ async setGameMode(gameMode) {
         this.gameInfo["isLightingCustom"] = this.isLightingCustom
 
         if (player.getSentHour() === null ||
-            player.getSentHour() !== this.sector.getHour()) {
+          player.getSentHour() !== this.sector.getHour()) {
           player.setSentHour(this.sector.getHour())
           this.gameInfo["hour"] = this.sector.getHour()
-          this.gameInfo["day"]  = this.sector.getDayCount()
+          this.gameInfo["day"] = this.sector.getDayCount()
         } else {
-          this.gameInfo["day"]  = null
+          this.gameInfo["day"] = null
           this.gameInfo["hour"] = null
         }
 
@@ -1742,7 +1740,17 @@ async setGameMode(gameMode) {
           this.gameInfo["camera"] = player.getCamera().toJson()
         }
         if (this.playerArrows) {
-        this.gameInfo["arrowList"] = JSON.stringify(this.playerArrows[player.name]||{})
+          if (this.playerArrows[player.name]) {
+            for (const [key, value] of Object.entries(this.playerArrows[player.name])) {
+              if (this.getEntityByNameOrId(this.playerArrows[player.name][key].pointTo) && this.getEntityByNameOrId(this.playerArrows[player.name][key].pointTo)?.getX() && this.getEntityByNameOrId(this.playerArrows[player.name][key].pointTo)?.getY()) {
+                this.playerArrows[player.name][key].row = (this.getEntityByNameOrId(this.playerArrows[player.name][key].pointTo)).getY()
+                this.playerArrows[player.name][key].col = this.getEntityByNameOrId(this.playerArrows[player.name][key].pointTo).getX()
+              } else {
+                this.playerArrows[player.name][key] = {}
+              }
+            }
+          }
+          this.gameInfo["arrowList"] = JSON.stringify(this.playerArrows[player.name] || {})
         }
 
         this.getSocketUtil().emit(player.socket, "GameState", this.gameInfo)
@@ -1769,7 +1777,7 @@ async setGameMode(gameMode) {
     let topTeams = this.getTopTeams()
     let topPlayers = this.getTopPlayers()
 
-    for(let id in this.players) {
+    for (let id in this.players) {
       let player = this.players[id]
       this.getSocketUtil().emit(player.socket, "Leaderboard", { rankings: topTeams, playerRankings: topPlayers })
     }
@@ -1820,7 +1828,8 @@ async setGameMode(gameMode) {
     if (data.type === "buildings") {
       return this.buildings[data.id]
     } else if (data.type === "units") {
-      return this.units[data.id] } else {
+      return this.units[data.id]
+    } else {
       return null
     }
   }
@@ -1975,7 +1984,7 @@ async setGameMode(gameMode) {
       playerData.remove()
 
       return player
-    } catch(e) {
+    } catch (e) {
       this.captureException(e)
       return null
     }
@@ -2086,7 +2095,7 @@ async setGameMode(gameMode) {
 
     if (this.isMiniGame()) {
       if (this.sector.eventHandler.isRoundStarted &&
-          !this.sector.miniGame.canAcceptPlayersMidGame()) {
+        !this.sector.miniGame.canAcceptPlayersMidGame()) {
         this.getSocketUtil().emit(socket, "CantJoin", { message: "Round already started" })
         return
       }
@@ -2124,29 +2133,29 @@ async setGameMode(gameMode) {
   initScenes() {
     let scene = this.createScene("VotingSkipped")
     scene.setCamera({ row: 43, col: 70, isPositionBased: true })
-    scene.addAction({ secondsTimestamp: 0, command: `/caption title Voting Skipped`  })
-    scene.addAction({ secondsTimestamp: 2, command: `/caption title `  })
+    scene.addAction({ secondsTimestamp: 0, command: `/caption title Voting Skipped` })
+    scene.addAction({ secondsTimestamp: 2, command: `/caption title ` })
     scene.setDuration(2)
 
     scene = this.createScene("EjectImposter")
     scene.setCamera({ row: 90, col: 10, isPositionBased: true })
-    scene.addAction({ secondsTimestamp: 0, command: `/tp {votedPlayer} 90 10`  })
-    scene.addAction({ secondsTimestamp: 0, command: `/effect give {votedPlayer} spin`  })
-    scene.addAction({ secondsTimestamp: 0, command: `/force {votedPlayer} 50 0`  })
-    scene.addAction({ secondsTimestamp: 1, command: `/caption subtitle It is {not} the imposter`  })
-    scene.addAction({ secondsTimestamp: 5, command: `/kill {votedPlayer}`  })
-    scene.addAction({ secondsTimestamp: 5, command: `/caption subtitle `  })
+    scene.addAction({ secondsTimestamp: 0, command: `/tp {votedPlayer} 90 10` })
+    scene.addAction({ secondsTimestamp: 0, command: `/effect give {votedPlayer} spin` })
+    scene.addAction({ secondsTimestamp: 0, command: `/force {votedPlayer} 50 0` })
+    scene.addAction({ secondsTimestamp: 1, command: `/caption subtitle It is {not} the imposter` })
+    scene.addAction({ secondsTimestamp: 5, command: `/kill {votedPlayer}` })
+    scene.addAction({ secondsTimestamp: 5, command: `/caption subtitle ` })
     scene.setDuration(5)
 
     scene = this.createScene("EmergencyMeeting")
     scene.setCamera({ row: 42, col: 70, isPositionBased: true })
-    scene.addAction({ secondsTimestamp: 1, command: `/caption title Who is the imposter....`  })
-    scene.addAction({ secondsTimestamp: 3, command: `/caption title `  })
+    scene.addAction({ secondsTimestamp: 1, command: `/caption title Who is the imposter....` })
+    scene.addAction({ secondsTimestamp: 3, command: `/caption title ` })
     scene.setDuration(3)
 
     scene = this.createScene("StationExplode")
     scene.setCamera({ row: 42, col: 70, isPositionBased: true })
-    scene.addAction({ secondsTimestamp: 1, command: `/projectile explosion {row} {col} scatter:true damage:400 shouldHitFloor:true`  })
+    scene.addAction({ secondsTimestamp: 1, command: `/projectile explosion {row} {col} scatter:true damage:400 shouldHitFloor:true` })
     scene.setDuration(3)
 
     scene = this.createScene("StarmancerTDMobSpawn")
@@ -2155,24 +2164,24 @@ async setGameMode(gameMode) {
 
     scene = this.createScene("StarmancerTDProtectCore")
     scene.setCamera({ row: 101, col: 64, isPositionBased: true })
-    scene.addAction({ secondsTimestamp: 1, command: `/caption title Protect the Core`  })
-    scene.addAction({ secondsTimestamp: 4, command: `/caption subtitle `  })
+    scene.addAction({ secondsTimestamp: 1, command: `/caption title Protect the Core` })
+    scene.addAction({ secondsTimestamp: 4, command: `/caption subtitle ` })
     scene.setDuration(4)
 
     scene = this.createScene("BurnImposter")
     scene.setCamera({ row: 64, col: 17, isPositionBased: true })
-    scene.addAction({ secondsTimestamp: 0, command: `/tp {votedPlayer} 64 17`  })
-    scene.addAction({ secondsTimestamp: 0, command: `/team leave {votedPlayer} void`  })
-    scene.addAction({ secondsTimestamp: 1, command: `/interact 9101 shoot`  })
-    scene.addAction({ secondsTimestamp: 1, command: `/interact 9102 shoot`  })
-    scene.addAction({ secondsTimestamp: 1, command: `/interact 9103 shoot`  })
-    scene.addAction({ secondsTimestamp: 1, command: `/interact 9104 shoot`  })
-    scene.addAction({ secondsTimestamp: 1, command: `/interact 9250 shoot`  })
-    scene.addAction({ secondsTimestamp: 1, command: `/interact 9258 shoot`  })
-    scene.addAction({ secondsTimestamp: 1, command: `/interact 9259 shoot`  })
-    scene.addAction({ secondsTimestamp: 1, command: `/interact 9260 shoot`  })
-    scene.addAction({ secondsTimestamp: 2, command: `/caption subtitle It is {not} the imposter`  })
-    scene.addAction({ secondsTimestamp: 5, command: `/caption subtitle `  })
+    scene.addAction({ secondsTimestamp: 0, command: `/tp {votedPlayer} 64 17` })
+    scene.addAction({ secondsTimestamp: 0, command: `/team leave {votedPlayer} void` })
+    scene.addAction({ secondsTimestamp: 1, command: `/interact 9101 shoot` })
+    scene.addAction({ secondsTimestamp: 1, command: `/interact 9102 shoot` })
+    scene.addAction({ secondsTimestamp: 1, command: `/interact 9103 shoot` })
+    scene.addAction({ secondsTimestamp: 1, command: `/interact 9104 shoot` })
+    scene.addAction({ secondsTimestamp: 1, command: `/interact 9250 shoot` })
+    scene.addAction({ secondsTimestamp: 1, command: `/interact 9258 shoot` })
+    scene.addAction({ secondsTimestamp: 1, command: `/interact 9259 shoot` })
+    scene.addAction({ secondsTimestamp: 1, command: `/interact 9260 shoot` })
+    scene.addAction({ secondsTimestamp: 2, command: `/caption subtitle It is {not} the imposter` })
+    scene.addAction({ secondsTimestamp: 5, command: `/caption subtitle ` })
     scene.setDuration(5)
   }
 
@@ -2194,10 +2203,10 @@ async setGameMode(gameMode) {
 
     //check if ip address is already in sector (don't allow more than 2 of the same ip)
     let ipCount = 0;
-    for(let id in this.players) {
-      if(Helper.getSocketRemoteAddress(this.players[id].socket) === ipAddress) {
-        ipCount ++;
-        if(ipCount >= 2) {
+    for (let id in this.players) {
+      if (Helper.getSocketRemoteAddress(this.players[id].socket) === ipAddress) {
+        ipCount++;
+        if (ipCount >= 2) {
           this.getSocketUtil().emit(socket, "CantJoin", { message: "You are already in this sector" })
           return
         }
@@ -2318,18 +2327,18 @@ async setGameMode(gameMode) {
 
     let player
 
-     player = new Player(socket, data, sectorToJoin)
-     if (!this.creator && this.isCreatedByPlayer(player)) {
-       if (!this.creatorUid) {
-         this.setCreatorUid(player.getUid())
-       }
-       this.creator = player
-     }
+    player = new Player(socket, data, sectorToJoin)
+    if (!this.creator && this.isCreatedByPlayer(player)) {
+      if (!this.creatorUid) {
+        this.setCreatorUid(player.getUid())
+      }
+      this.creator = player
+    }
 
     //  hack to send player team to matchmaker
     //  as isSectorOwner will have correct value by now
     //  FIX: TBD
-     player.getTeam() && player.getTeam().onTeamChanged()
+    player.getTeam() && player.getTeam().onTeamChanged()
 
     // if (debugMode) {
     //     let playerData = Object.values(this.playerDataMap).find((pd) => { return pd.data.name === 'KanicoTheGreat' })
@@ -2343,9 +2352,18 @@ async setGameMode(gameMode) {
 
   }
 
-  setActiveScene(scene) {
-    this.activeScene = scene
+  setActiveScene(scene, state) {
+    if (!this.activeScene) {
+      this.activeScene = {};
+    }
+
+    if (!state) {
+      delete this.activeScene[scene.name];
+    } else {
+      this.activeScene[scene.name] = scene;
+    }
   }
+
 
   isFull() {
     return this.getPlayerCount() >= 5
@@ -2461,7 +2479,7 @@ async setGameMode(gameMode) {
     for (let id in this.players) {
       let player = this.players[id]
       if (player.getUid() === playerTag ||
-          player.getRemoteAddress() === playerTag) {
+        player.getRemoteAddress() === playerTag) {
         result.push(player)
       }
     }
@@ -2489,7 +2507,7 @@ async setGameMode(gameMode) {
     for (let id in this.players) {
       let player = this.players[id]
       if (player.getUid() === playerTag ||
-          player.getRemoteAddress() === playerTag) {
+        player.getRemoteAddress() === playerTag) {
         result = player
         break
       }
@@ -2856,7 +2874,7 @@ async setGameMode(gameMode) {
     const users = this.getPlayerList()
 
     if (users.length > 0) {
-      users.sort(function(a,b) {
+      users.sort(function (a, b) {
         return b.wins - a.wins
       })
 
@@ -2882,10 +2900,10 @@ async setGameMode(gameMode) {
             this.leaderboard[i].name !== topUsers[i].name ||
             this.leaderboard[i].score !== topUsers[i].score ||
             this.leaderboard[i].sectorId !== topUsers[i].sectorId) {
-              this.leaderboard = topUsers
-              this.leaderboardChanged = true
-              // LOG.info("leaderboard changed: " + this.leaderboard)
-              break
+            this.leaderboard = topUsers
+            this.leaderboardChanged = true
+            // LOG.info("leaderboard changed: " + this.leaderboard)
+            break
           }
         }
       }

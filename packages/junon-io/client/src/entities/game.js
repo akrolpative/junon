@@ -3269,12 +3269,24 @@ console.log(options)
     let NewArrows = JSON.parse(this.arrowList || "{}")
 
     for (const [key, value] of Object.entries(NewArrows)) {
+      let entityFoundById = this.sector.getEntity(value.pointTo)
+      if (!entityFoundById) {
+        if (document.querySelector('#setarrowcommand'+key)) {
+      document.querySelector('#setarrowcommand'+key).style.opacity = "0"
+        }
+      continue
+      }
+
       if (!document.querySelector('#setarrowcommand'+key)) {
         this.createPlayerArrow(this.player,key)
       }
-      let entityFoundById = this.sector.getEntity(value.pointTo)
-      if (entityFoundById) {
-      this.updatePlayerArrow(this.player,entityFoundById.getX(),entityFoundById.getY(),document.querySelector('#setarrowcommand'+key),value.color||"#ffffff",value.tooltip||"",value.size||"24px",value.isbg||"true")
+      if (!(entityFoundById == this.player)) {
+        if (document.querySelector("#setarrowcommand"+key).style.opacity == "0") {
+          document.querySelector("#setarrowcommand"+key).style.opacity == "0.9"
+          if (!document.querySelector("#setarrowcommand"+key).startTween) {document.querySelector("#setarrowcommand"+key).startTween = ClientHelper.getFadeTween(document.querySelector("#setarrowcommand"+key), 0, 1, 0)}
+          document.querySelector("#setarrowcommand"+key).startTween.start()
+        }
+      this.updatePlayerArrow(this.player,value.col,value.row,document.querySelector('#setarrowcommand'+key),value.color||"#ffffff",value.tooltip||"",value.size||"24px",value.isbg||"true")
     } else {
       document.querySelector('#setarrowcommand'+key).style.opacity = "0"
     }

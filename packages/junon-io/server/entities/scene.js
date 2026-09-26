@@ -3,17 +3,27 @@ const SceneAction = require("./scene_action")
 const Constants = require('../../common/constants.json')
 
 class Scene {
-  constructor(game, name,options) {
+  constructor(game, name, options) {
     this.game = game
     this.name = name
     this.sector = game.sector
+    this.affectedPlayers = {}
 
     this.timeline = {}
     this.seconds = 0
-    this.setDuration(this.seconds)
-    this.entityToPoint = options.entityId
+    this.setDuration(options.duration)
 
-    console.log(options.duration)
+    if (options.row && options.col) {
+      this.row = options.row
+      this.col = options.col
+    } else {
+      this.entityToPoint = options.entityId
+    }
+    this.chat = options.chat
+    this.movement = options.movement
+    this.cinematic = options.cinematic
+    this.fov = options.fov
+
     this.register()
   }
 
@@ -31,11 +41,11 @@ class Scene {
       object.x = object.col * Constants.tileSize
       object.y = object.row * Constants.tileSize
 
-      object.getX = function() {
+      object.getX = function () {
         return object.col * Constants.tileSize
       }
 
-      object.getY = function() {
+      object.getY = function () {
         return object.row * Constants.tileSize
       }
     }
@@ -74,8 +84,11 @@ class Scene {
 
   play(options = {}) {
 
-    this.origFovMode = this.sector.settings["isFovMode"]
-    this.sector.editSetting("isFovMode", false)
+    this.seconds = 0
+    this.game.setActiveScene(this, true)
+    this.playOptions = options
+    this.isFinished = false
+    this.startTimestamp = this.game.timestamp
 
     if (options.camera) {
       let entity = this.game.getEntity(options.camera)
@@ -83,30 +96,40 @@ class Scene {
         this.camera = entity
       } else {
         let row = parseInt(options.camera.split("-")[0])
-        let col = parseInt(options.camera.split("-")[1]) 
+        let col = parseInt(options.camera.split("-")[1])
         if (!isNaN(row) && !isNaN(col) && !this.sector.isOutOfBounds(row, col)) {
           this.camera = { row: row, col: col, isPositionBased: true }
         }
       }
     } else {
-      let row = parseInt(this.entityToPoint.getRow())
-      let col = parseInt(this.entityToPoint.getCol())
-      if (!isNaN(row) && !isNaN(col) && !this.sector.isOutOfBounds(row, col)) {
-        this.camera = {row: row, col:col, isPositionBased: true}
+      if (this.entityToPoint) {
+        let row = parseInt(this.entityToPoint.getRow())
+        let col = parseInt(this.entityToPoint.getCol())
+        if (!isNaN(row) && !isNaN(col) && !this.sector.isOutOfBounds(row, col)) {
+          this.camera = { row: row, col: col, isPositionBased: true }
+        }
+      } else if (this.row && this.col) {
+        this.camera = { row: parseInt(this.row), col: parseInt(this.col), isPositionBased: true }
       }
     }
 
-    this.playOptions = options
 
-    this.isFinished = false
-    this.startTimestamp = this.game.timestamp
-    this.game.setActiveScene(this)
+    if (options.playersToAffect.length > 0) {
+      options.playersToAffect.forEach((player) => {
+        this.affectedPlayers[player] = player
+        this.sendCameraTargetToClient(player)
+        player.setCameraFocusTarget(this.camera)
+        this.getSocketUtil().emit(player.getSocket(), "StartScene", { name: this.name })
+      })
+    } else {
 
-    this.game.forEachPlayer((player) => {
-      this.sendCameraTargetToClient(player)
-      player.setCameraFocusTarget(this.camera)
-      this.getSocketUtil().emit(player.getSocket(), "StartScene", { name: this.name })
-    })
+      this.game.forEachPlayer((player) => {
+        this.affectedPlayers[player] = player
+        this.sendCameraTargetToClient(player)
+        player.setCameraFocusTarget(this.camera)
+        this.getSocketUtil().emit(player.getSocket(), "StartScene", { name: this.name })
+      })
+    }
   }
 
   executeTurn() {
@@ -133,6 +156,7 @@ class Scene {
       this.seconds = 0
     } else {
       this.seconds += 1
+      console.log(this.name)
     }
   }
 
@@ -152,9 +176,10 @@ class Scene {
     this.sector.editSetting("isFovMode", this.origFovMode)
 
     this.isFinished = true
-    this.game.setActiveScene(null)
+    this.game.setActiveScene(this, false)
 
-    this.game.forEachPlayer((player) => {
+    for (let ply in this.affectedPlayers) {
+      let player = this.affectedPlayers[ply]
       player.resetCameraFocusTarget()
       this.getSocketUtil().emit(player.getSocket(), "EndScene", { name: this.name })
       if (this.sector.settings["isFovMode"]) {
@@ -162,7 +187,8 @@ class Scene {
           player.assignFov()
         }
       }
-    })
+    }
+    this.affectedPlayers = {}
 
     this.game.triggerEvent("scene:" + this.name + ":end")
   }

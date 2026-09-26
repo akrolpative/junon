@@ -72,9 +72,9 @@ const Foods = require("./foods/index")
 class Sector {
 
   constructor(game, metadata, entities) {
-    this.game  = game
+    this.game = game
 
-    this.id    = metadata.id || game.generateEntityId()
+    this.id = metadata.id || game.generateEntityId()
 
     this.uid = this.game.sectorUid || this.id.toString()
 
@@ -198,7 +198,7 @@ class Sector {
   initKeyCodes(entities) {
     this.keyCodes = {}
 
-    if(!entities || !entities.keyCodes) return
+    if (!entities || !entities.keyCodes) return
 
     this.keyCodes = entities.keyCodes
   }
@@ -244,9 +244,9 @@ class Sector {
     let json
     try {
       if (this.canUseCommandBlocks()) {
-        json  = JSON.parse(entities.commandBlockFullJson)
+        json = JSON.parse(entities.commandBlockFullJson)
       }
-    } catch(e) {
+    } catch (e) {
     }
 
     if (json) {
@@ -300,7 +300,7 @@ class Sector {
     }
 
     if (this.game.origSectorUid === "BPF0uFha5QLUr" ||
-        this.game.origSectorUid === "PnGkJd5xZsb0v") {
+      this.game.origSectorUid === "PnGkJd5xZsb0v") {
       if (this.isMiniGame()) {
         this.eventHandler.importFromCommandBlock(this.commandBlock)
       }
@@ -319,7 +319,7 @@ class Sector {
     let request
 
     if (env === 'test') {
-      request = new PositionSearchRequest(this, {row: 96, col: 4 })
+      request = new PositionSearchRequest(this, { row: 96, col: 4 })
     } else {
       request = new PositionSearchRequest(this)
     }
@@ -375,55 +375,55 @@ class Sector {
   }
 
 
-initSettings(entities) {
-  // Base/default settings
-  this.settings = {
-    isPvPAllowed: false,
-    isFovMode: false,
-    isZoomAllowed: true,
-    showMiniMap: true,
-    showPlayerList: true,
-    isMobAutospawn: true,
-    isFloorAutodirt: true,
-    isStaminaEnabled: true,
-    isHungerEnabled: true,
-    isOxygenEnabled: true,
-    isChatEnabled: true,
-    isInfiniteAmmo: false,
-    isInfinitePower: false,
-    isCorpseEnabled: true,
-    isShadowsEnabled: true,
-    isPlayerSavingEnabled: true,
-    showTeamJoin: false,
-    isCraftingEnabled: true,
-    isBloodEnabled: true,
-    isSuitChangeEnabled: true,
-    isDropInventoryOnDeath: false,
-    isMutantEnabled: true,
-    isGravityEnabled: false,
-    isFireSpreadEnabled: true,
-    isItemBreakingEnabled: true,
-    isSpectateAllowed: true,
-    isOverclockEnabled: false,
-  };
+  initSettings(entities) {
+    // Base/default settings
+    this.settings = {
+      isPvPAllowed: false,
+      isFovMode: false,
+      isZoomAllowed: true,
+      showMiniMap: true,
+      showPlayerList: true,
+      isMobAutospawn: true,
+      isFloorAutodirt: true,
+      isStaminaEnabled: true,
+      isHungerEnabled: true,
+      isOxygenEnabled: true,
+      isChatEnabled: true,
+      isInfiniteAmmo: false,
+      isInfinitePower: false,
+      isCorpseEnabled: true,
+      isShadowsEnabled: true,
+      isPlayerSavingEnabled: true,
+      showTeamJoin: false,
+      isCraftingEnabled: true,
+      isBloodEnabled: true,
+      isSuitChangeEnabled: true,
+      isDropInventoryOnDeath: false,
+      isMutantEnabled: true,
+      isGravityEnabled: false,
+      isFireSpreadEnabled: true,
+      isItemBreakingEnabled: true,
+      isSpectateAllowed: true,
+      isOverclockEnabled: false,
+    };
 
-  if (this.isPeaceful()) {
-    this.settings.isFireSpreadEnabled = false;
-    this.settings.isItemBreakingEnabled = true;
-  }
-  
-  if (entities && entities.settings) {
-    for (let name in entities.settings) {
-      if (typeof this.settings[name] !== 'undefined') {
-        this.settings[name] = entities.settings[name];
+    if (this.isPeaceful()) {
+      this.settings.isFireSpreadEnabled = false;
+      this.settings.isItemBreakingEnabled = true;
+    }
+
+    if (entities && entities.settings) {
+      for (let name in entities.settings) {
+        if (typeof this.settings[name] !== 'undefined') {
+          this.settings[name] = entities.settings[name];
+        }
       }
     }
-  }
 
-  if (this.isHardcore()) {
-    this.settings.isFovMode = true;
+    if (this.isHardcore()) {
+      this.settings.isFovMode = true;
+    }
   }
-}
 
 
   canBeCrafted(type) {
@@ -540,7 +540,7 @@ initSettings(entities) {
   }
 
   initDefaultSellables() {
-    let itemKlasses = [Ores.Sand, Ores.Wood, Buildings.CoffeeSeed, Buildings.WheatSeed, Buildings.PotatoSeed, Buildings.SunflowerSeed, Buildings.BlueSeed, Buildings.PoppySeed,Buildings.PumpkinSeed,Buildings.RiceSeed, Foods.Starberries, Foods.Fish, Mobs.Chicken, Mobs.Monkey, Mobs.Cat, Mobs.CleanBot, Mobs.Car, Equipments.CombatArmor, Equipments.SantaHat, Equipments.NameTag]
+    let itemKlasses = [Ores.Sand, Ores.Wood, Buildings.CoffeeSeed, Buildings.WheatSeed, Buildings.PotatoSeed, Buildings.SunflowerSeed, Buildings.BlueSeed, Buildings.PoppySeed, Buildings.PumpkinSeed, Buildings.RiceSeed, Foods.Starberries, Foods.Fish, Mobs.Chicken, Mobs.Monkey, Mobs.Cat, Mobs.CleanBot, Mobs.Car, Equipments.CombatArmor, Equipments.SantaHat, Equipments.NameTag]
     itemKlasses.forEach((klass) => {
       let group = klass.prototype.isMob() ? "mob" : "item"
       this.sellables[klass.prototype.getTypeName()] = { group: group, type: klass.prototype.getType(), cost: klass.getCost() }
@@ -808,7 +808,7 @@ initSettings(entities) {
         return;
       }
 
-      if(!this.canEditSetting(key)) return;
+      if (!this.canEditSetting(key)) return;
 
       // convert to bool
       if (value === "true") value = true
@@ -825,7 +825,7 @@ initSettings(entities) {
         if (value === false) {
           this.game.forEachPlayer((player) => {
             if (player.ghost) {
-            player.possess(player)
+              player.possess(player)
             }
           })
         }
@@ -834,11 +834,11 @@ initSettings(entities) {
   }
 
   canEditSetting(key) {
-    if(this.gameMode === 'hardcore' || !this.gameMode) return false;
-    if(this.gameMode === 'survival') {
-      let allowedSettingChanges = ['isPvPAllowed',"isFovMode", "isZoomAllowed", "showMiniMap", "showPlayerList", "isChatEnabled", "isPlayerSavingEnabled", "isGravityEnabled", "isSpectateAllowed"]
+    if (this.gameMode === 'hardcore' || !this.gameMode) return false;
+    if (this.gameMode === 'survival') {
+      let allowedSettingChanges = ['isPvPAllowed', "isFovMode", "isZoomAllowed", "showMiniMap", "showPlayerList", "isChatEnabled", "isPlayerSavingEnabled", "isGravityEnabled", "isSpectateAllowed"]
 
-      if(allowedSettingChanges.indexOf(key) === -1) return false;
+      if (allowedSettingChanges.indexOf(key) === -1) return false;
     }
 
     return true;
@@ -886,7 +886,7 @@ initSettings(entities) {
   isHardcore() {
     return this.gameMode === 'hardcore'
   }
-  
+
 
   canUseCommandBlocks() {
     return this.isPeaceful() || this.isMiniGame()
@@ -983,13 +983,13 @@ initSettings(entities) {
           [sequelize.fn('sum', sequelize.col('upvote')), 'totalUpvoteCount'],
           [sequelize.fn('sum', sequelize.col('downvote')), 'totalDownvoteCount']
         ],
-        group : ['sectorUid'],
+        group: ['sectorUid'],
         raw: true,
         where: { sectorUid: this.getUid() }
       })
 
       let baseCount = 10
-      let upvoteCount   = parseInt(result[0].totalUpvoteCount)
+      let upvoteCount = parseInt(result[0].totalUpvoteCount)
       let downvoteCount = parseInt(result[0].totalDownvoteCount)
       let normalizeUpvoteCount = upvoteCount + baseCount
       let normalizeDownvoteCount = downvoteCount + baseCount
@@ -1003,7 +1003,7 @@ initSettings(entities) {
       }, {
         where: { uid: this.getUid() }
       })
-    } catch(e) {
+    } catch (e) {
       this.game.captureException(e)
     }
   }
@@ -1139,7 +1139,7 @@ initSettings(entities) {
   }
 
   initOtherGrids() {
-    this.groundMap   = new Grid("ground",    this, this.getRowCount(), this.getColCount())
+    this.groundMap = new Grid("ground", this, this.getRowCount(), this.getColCount())
     this.homeArea = new HomeArea(this)
   }
 
@@ -1245,7 +1245,7 @@ initSettings(entities) {
       }
     }
   }
-  
+
   removeStructures(row, col) {
     let tile = this.structureMap.get(row, col)
     if (tile) {
@@ -1299,8 +1299,8 @@ initSettings(entities) {
   }
 
   initChunks() {
-    const numOfTileRows  = this.getRowCount()
-    const numOfTileCols  = this.getColCount()
+    const numOfTileRows = this.getRowCount()
+    const numOfTileCols = this.getColCount()
     const numOfChunkRows = numOfTileRows / Constants.chunkRowCount
     const numOfChunkCols = numOfTileCols / Constants.chunkColCount
 
@@ -1370,7 +1370,7 @@ initSettings(entities) {
         building.remove()
         return true
       }
-    } catch(e) {
+    } catch (e) {
       this.game.captureException(e)
       return false
     }
@@ -1398,7 +1398,7 @@ initSettings(entities) {
           data.progress += 1
         }
       }
-    } catch(e) {
+    } catch (e) {
       this.game.captureException(e)
     }
   }
@@ -1425,7 +1425,7 @@ initSettings(entities) {
           data.entity.setStamina(data.entity.stamina + 3)
         }
       }
-    } catch(e) {
+    } catch (e) {
       this.game.captureException(e)
     }
   }
@@ -1878,8 +1878,8 @@ initSettings(entities) {
     this.MAX_SEARCH_SPAWN_COUNT = 50
 
     this.treeList = ["playerTree", "mobTree", "projectileTree", "buildingTree",
-                     "shipBuildingTree", "unitTree", "terrainTree",
-                     "pickupTree", "regionTree", "shipTree", "roomTree"]
+      "shipBuildingTree", "unitTree", "terrainTree",
+      "pickupTree", "regionTree", "shipTree", "roomTree"]
 
     /*
       see Chunk#sendChangedProjectilesToClients
@@ -1928,7 +1928,7 @@ initSettings(entities) {
   getOccupancyPercentage() {
     let mapTileCount = this.getRowCount() * this.getColCount()
     let ratio = this.homeArea.getTileCount() / (mapTileCount / 2)
-    return Math.min(100,Math.floor(ratio * 100))
+    return Math.min(100, Math.floor(ratio * 100))
   }
 
   addTerminalMessage(user, msg) {
@@ -1974,7 +1974,7 @@ initSettings(entities) {
   }
 
   getTreeFromEntityType(entityType, container) {
-    this.trees  = this.trees || {
+    this.trees = this.trees || {
       "terrains": this.terrainTree,
       "players": this.playerTree,
       "mobs": this.mobTree,
@@ -2052,22 +2052,22 @@ initSettings(entities) {
     let ground = this.findRandomGround()
 
     let left = ground.getX() - Math.floor(w / 2)
-    let top  = ground.getY() - Math.floor(h / 2)
+    let top = ground.getY() - Math.floor(h / 2)
     let centerX = ground.getX()
     let centerY = ground.getY()
 
     // shift appropriately so that tiles would fit on square blocks
-    let isWidthEven = (w / Constants.tileSize) % 2  === 0
-    let isHeightEven = (w / Constants.tileSize) % 2  === 0
+    let isWidthEven = (w / Constants.tileSize) % 2 === 0
+    let isHeightEven = (w / Constants.tileSize) % 2 === 0
 
     if (isWidthEven) {
-      left = left - Constants.tileSize/2
-      centerX = centerX - Constants.tileSize/2
+      left = left - Constants.tileSize / 2
+      centerX = centerX - Constants.tileSize / 2
     }
 
     if (isHeightEven) {
-      top = top - Constants.tileSize/2
-      centerY = centerY - Constants.tileSize/2
+      top = top - Constants.tileSize / 2
+      centerY = centerY - Constants.tileSize / 2
     }
 
     const box = {
@@ -2104,11 +2104,11 @@ initSettings(entities) {
       randomX = Math.floor(randomX / Constants.tileSize) * Constants.tileSize + (Constants.tileSize / 2)
       randomY = Math.floor(randomY / Constants.tileSize) * Constants.tileSize + (Constants.tileSize / 2)
 
-      left = this.normalizeSpawnPos(randomX - w/2)
-      top  = this.normalizeSpawnPos(randomY - h/2)
+      left = this.normalizeSpawnPos(randomX - w / 2)
+      top = this.normalizeSpawnPos(randomY - h / 2)
 
       left = Math.floor(left / Constants.tileSize) * Constants.tileSize
-      top  = Math.floor(top / Constants.tileSize) * Constants.tileSize
+      top = Math.floor(top / Constants.tileSize) * Constants.tileSize
     }
 
 
@@ -2200,7 +2200,7 @@ initSettings(entities) {
   safeCreateTeam(data) {
     try {
       new Team(this, data)
-    } catch(e) {
+    } catch (e) {
       this.game.captureException(e)
     }
   }
@@ -2208,7 +2208,7 @@ initSettings(entities) {
   safeCreatePlayerData(data) {
     try {
       new PlayerData(this, data)
-    } catch(e) {
+    } catch (e) {
       LOG.error(e)
       this.game.captureException(e)
     }
@@ -2223,7 +2223,7 @@ initSettings(entities) {
       data.item = item
 
       new Pickup(this, data)
-    } catch(e) {
+    } catch (e) {
       this.game.captureException(e)
     }
   }
@@ -2234,7 +2234,7 @@ initSettings(entities) {
         // must be valid mob type
         new Corpse(this, data)
       }
-    } catch(e) {
+    } catch (e) {
       this.game.captureException(e)
     }
   }
@@ -2244,7 +2244,7 @@ initSettings(entities) {
       if (data.type === 15) return // ghost
       let mobKlass = Mobs.forType(data.type)
       new mobKlass(this, data)
-    } catch(e) {
+    } catch (e) {
       this.game.captureException(e)
     }
   }
@@ -2253,7 +2253,7 @@ initSettings(entities) {
     try {
       let transportKlass = Transports.forType(data.type)
       new transportKlass(this, data)
-    } catch(e) {
+    } catch (e) {
       this.game.captureException(e)
     }
   }
@@ -2315,10 +2315,10 @@ initSettings(entities) {
   createContinent(targetChunkRegion) {
     let continent = new Continent(this)
     let traversal = this.traverseChunkRegionsUntil(targetChunkRegion,
-       { all: true, passThroughWall: true } ,
-       (chunkRegion) => {
-      return chunkRegion.isSky !== targetChunkRegion.isSky
-    })
+      { all: true, passThroughWall: true },
+      (chunkRegion) => {
+        return chunkRegion.isSky !== targetChunkRegion.isSky
+      })
 
     for (let chunkRegionId in traversal.visited) {
       let chunkRegion = traversal.visited[chunkRegionId]
@@ -2391,7 +2391,7 @@ initSettings(entities) {
         passThroughPenetrableWall: options.passThroughPenetrableWall || false
       })
       let shouldStopNeighborTraversal = desiredChunkRegion ||
-                                        options.neighborStopCondition(chunkRegion, hops)
+        options.neighborStopCondition(chunkRegion, hops)
 
       for (var i = 0; !shouldStopNeighborTraversal && i < chunkRegionNeighbors.length; i++) {
         let chunkRegionNeighbor = chunkRegionNeighbors[i]
@@ -2412,7 +2412,7 @@ initSettings(entities) {
   safePlaceBuilding(data) {
     try {
       return this.placeBuilding(data)
-    } catch(e) {
+    } catch (e) {
       this.game.captureException(e)
       return null
     }
@@ -2421,8 +2421,8 @@ initSettings(entities) {
   getBlueprintBox(x, y, w, h, padding) {
     return {
       pos: {
-        x: x - w/2,
-        y: y - h/2,
+        x: x - w / 2,
+        y: y - h / 2,
       },
       w: w + padding * 2,
       h: h + padding * 2
@@ -2471,7 +2471,7 @@ initSettings(entities) {
 
   getRandomRoom() {
     const rooms = Object.values(this.roomManager.rooms)
-    const index =  Math.floor(Math.random() * rooms.length)
+    const index = Math.floor(Math.random() * rooms.length)
     return rooms[index]
   }
 
@@ -2517,8 +2517,8 @@ initSettings(entities) {
   }
 
   getHourDuration(timestampDuration) {
-    const hoursPerSecond = 1/Constants.secondsPerHour
-    const secondsPerTick = 1/Constants.physicsTimeStep
+    const hoursPerSecond = 1 / Constants.secondsPerHour
+    const secondsPerTick = 1 / Constants.physicsTimeStep
 
     return Math.floor(timestampDuration * secondsPerTick * hoursPerSecond)
   }
@@ -2570,7 +2570,7 @@ initSettings(entities) {
     for (var i = 0; i < doors.length; i++) {
       let door = doors[i]
 
-      let dockWidth  = 6  * Constants.tileSize
+      let dockWidth = 6 * Constants.tileSize
       let dockHeight = 10 * Constants.tileSize
       let dockingBoundingBox = door.getDockingBoundingBox(dockWidth, dockHeight)
       if (dockingBoundingBox) {
@@ -2658,8 +2658,8 @@ initSettings(entities) {
   }
 
   setTime(hour) {
-    const hoursPerSecond = 1/Constants.secondsPerHour
-    const secondsPerTick = 1/Constants.physicsTimeStep
+    const hoursPerSecond = 1 / Constants.secondsPerHour
+    const secondsPerTick = 1 / Constants.physicsTimeStep
 
     // we change the actual game timestamp
     let hourDifference = hour.hour - this.game.hour
@@ -2781,7 +2781,7 @@ initSettings(entities) {
       x = options.x * Constants.tileSize + Constants.tileSize / 2 || firstPlayer.getX() + caller.getRandomOffset(Constants.tileSize * 2)
       y = options.y * Constants.tileSize + Constants.tileSize / 2 || firstPlayer.getY() + caller.getRandomOffset(Constants.tileSize * 2)
     }
-    console.log(options.x, options.y, caller.getX(),caller.getY())
+    console.log(options.x, options.y, caller.getX(), caller.getY())
 
     new Corpse(this, { x: x, y: y, type: corpseType, name: options.name })
   }
@@ -2793,7 +2793,7 @@ initSettings(entities) {
   getCorpseCount() {
     return Object.keys(this.corpses).length
   }
-  
+
   getMaxCorpseCount() {
     return 200
   }
@@ -2815,8 +2815,8 @@ initSettings(entities) {
     }
 
     options.owner = this
-    options.source = { x: x, y: y}
-    options.destination = { x: x, y: y}
+    options.source = { x: x, y: y }
+    options.destination = { x: x, y: y }
     klass.build(options)
   }
 
@@ -2832,7 +2832,7 @@ initSettings(entities) {
     const klassName = this.klassifySnakeCase(options.type) || "Spider"
     const caller = options.player
     let count = options.count || 1
-    if (count > 50 ) count = 50
+    if (count > 50) count = 50
 
     if (caller && caller.isPlayer()) {
       options.x = options.x || caller.getX() + caller.getRandomOffset(Constants.tileSize * 2)
@@ -2936,7 +2936,7 @@ initSettings(entities) {
   }
 
   insertEntityToTreeByName(entity, groupName) {
-    if(entity.isRemoved && entity.isRemoved()) return
+    if (entity.isRemoved && entity.isRemoved()) return
     let tree = this.getTreeFromEntityType(groupName, entity.getContainer())
     entity.updateRbushCoords()
     entity.onWorldPostStep()
@@ -2981,7 +2981,7 @@ initSettings(entities) {
   safeExecuteTurn(entity) {
     try {
       entity.executeTurn()
-    } catch(e) {
+    } catch (e) {
       this.game.captureException(e)
     }
   }
@@ -2995,7 +2995,7 @@ initSettings(entities) {
           queue.shift()
         }
       }
-    } catch(e) {
+    } catch (e) {
       this.game.captureException(e)
     }
   }
@@ -3013,7 +3013,7 @@ initSettings(entities) {
     try {
       entity.checkDrainableUsage()
       delete this.pendingDrainables[entity.getId()]
-    } catch(e) {
+    } catch (e) {
       this.game.captureException(e)
     }
   }
@@ -3025,7 +3025,7 @@ initSettings(entities) {
   safeExecute(cb) {
     try {
       cb()
-    } catch(e) {
+    } catch (e) {
       this.game.captureException(e)
     }
   }
@@ -3033,7 +3033,7 @@ initSettings(entities) {
   safeGrowFire(entity) {
     try {
       entity.growFire()
-    } catch(e) {
+    } catch (e) {
       this.game.captureException(e)
     }
   }
@@ -3062,8 +3062,8 @@ initSettings(entities) {
           let tile = this.getStandingPlatform(row, col)
           if (tile && tile.isGroundTile()) {
             let data = {
-              x: rowCol[1] * Constants.tileSize + Constants.tileSize/2,
-              y: rowCol[0] * Constants.tileSize + Constants.tileSize/2
+              x: rowCol[1] * Constants.tileSize + Constants.tileSize / 2,
+              y: rowCol[0] * Constants.tileSize + Constants.tileSize / 2
             }
             new Buildings.FiberSeed(data, this)
             plantedCount += 1
@@ -3096,10 +3096,10 @@ initSettings(entities) {
 
     for (let entityId in this.flames) {
       let entity = this.flames[entityId]
-      if(!entity.effects.fire || entity.isRemoved) {
+      if (!entity.effects.fire || entity.isRemoved) {
         delete this.flames[entityId]
         return;
-      } 
+      }
       this.safeGrowFire(entity)
     }
 
@@ -3115,7 +3115,8 @@ initSettings(entities) {
 
     for (let shipId in this.ships) {
       let ship = this.ships[shipId]
-      this.safeExecuteTurn(ship) }
+      this.safeExecuteTurn(ship)
+    }
 
     for (let buildingId in this.towers) {
       let building = this.towers[buildingId]
@@ -3179,7 +3180,9 @@ initSettings(entities) {
     this.removeDecayedBuildings()
 
     if (this.game.activeScene) {
-      this.safeExecuteTurn(this.game.activeScene)
+      for (let sceneKey in this.game.activeScene) {
+        this.safeExecuteTurn(this.game.activeScene[sceneKey]);
+      }
     }
 
     this.eventHandler.flushLogs()
@@ -3195,7 +3198,7 @@ initSettings(entities) {
         if (pickup.shouldDecay()) {
           pickup.remove()
         }
-      } catch(e) {
+      } catch (e) {
         this.game.captureException(e)
       }
     }
@@ -3268,7 +3271,7 @@ initSettings(entities) {
         if (corpse.shouldDecay()) {
           corpse.remove()
         }
-      } catch(e) {
+      } catch (e) {
         this.game.captureException(e)
       }
     }
@@ -3309,7 +3312,7 @@ initSettings(entities) {
     })
     if (!sectorModel) return
 
-    let token = uuidv4().replace(/-/g,'')
+    let token = uuidv4().replace(/-/g, '')
 
     let thumbnailPath = this.getScreenshotThumbnailPath(token)
 

@@ -4941,6 +4941,12 @@ class Player extends BaseEntity {
       this.cameraFocusTarget = null
     }
 
+    if (this.game.playerArrows) {
+    if (this.game.playerArrows[this.name]) {
+      delete this.game.playerArrows[this.name]
+    } 
+    }
+
     this.unregisterEventListeners()
     this.removeChunkSubscriptions()
     this.removeViewSubscriptions()
