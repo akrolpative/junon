@@ -286,8 +286,8 @@
                         `Returns the Nth word of a value. Ex. $getNthWord(3,abcdef abc xyz kuroro) = xyz`,
                     ],
                     [   `$getValuePosition`,
-                        `index, valueToCheck, value`,
-                        `Returns the position of the index occurences of the valueToCheck in a given value. Ex. $getValuePosition(2,kuroro,and kuroro will kuroro or kuroro) = 17`,
+                        `index, valueToCheck, value, w (optional)`,
+                        `Returns the position of the index occurences of the valueToCheck in a given value. Attach an optional fourth parameter "w" for it to return the index occurence in word index. Ex. $getValuePosition(2,kuroro,and kuroro will kuroro or kuroro) = 17, $getValuePosition(2,kuroro,and kuroro will kuroro or kuroro,w) = 4`,
                     ],
                     [   `$getValueLength`,
                         `value`,
@@ -305,6 +305,16 @@
                     [   `$getRemovedValue`,
                         `index, valueToRemove, value`,
                         `Returns the value after the valueToRemove is removed at the given index occurence from the value. Ex. $getRemovedValue(2,abc,abcdefg_abcdefg) = abcdefg_defg`,
+                    ],
+                    [
+                        `$replaceValue`,
+                        'index, valueToReplace, valueToInsert, value',
+                        `Returns the value after all instances of valueToReplace after index letters is replaced with valueToInsert from value. Ex. $getReplacedValue(0,ca,z,cabca) = zbz, $getReplacedValue(2,ca,z,cabca) = cabz`,
+                    ],
+                    [
+                        `$convertIndex`,
+                        'index, value, w/l (word/letter), w/l (word/letter)',
+                        `Converts the index according to the value and the index type to convert from (third parameter) to convert to (fourth parameter). Ex. $convertIndex(3,abc a b c,w,l) = 7, $convertIndex(3,abc a b c,l,w) = 1`,
                     ],
                 ],
                 Mathematical_Operations: [
@@ -420,7 +430,7 @@
                     ],
                     [   `$getDate`,
                         `year/month/day/dayweek/hour/minute/second/millisecond/unixms, year month day hour minute second millisecond`,
-                        `Returns the date in UTC as number when provided with the time component to check for and the date to check from (first and second parameters). If the second parameter is empty, then it will return using the current date in UTC. Ex. $getDate(hour) will return today's hour, $getDate(year,2014 4 1) will return 2014, $getDate(unixms) will return today's date in unix milliseconds.`,
+                        `Returns the date in UTC as number when provided with the time component to check for and the date to check from (first and second parameters). If the second parameter is empty, then it will return using the current date in UTC. Ex. $getDate(hour) = today's hour, $getDate(year,2014 4 1) = 2014, $getDate(unixms) = today's date in unix milliseconds.`,
                     ],
                 ],
             };
