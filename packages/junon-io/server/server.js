@@ -1,3 +1,5 @@
+require('dotenv').config({ path: require('path').resolve(__dirname, '../../../.env'), quiet: true })
+
 global.env = process.env.NODE_ENV || 'development'
 global.pid = process.pid
 
@@ -61,6 +63,20 @@ global.appRoot = path.resolve(__dirname + '/../')
 
 debugMode = (env === 'development' || env === 'test') ? true : false
 
+// Firebase is an optional production integration. Local runs must not require
+// Application Default Credentials just because the machine has network access.
+if (debugMode && process.env.JUNON_USE_FIREBASE !== 'true') {
+  global.isOffline = true
+}
+
+// NODE_ENV=test normally isolates the game server from the matchmaker entirely
+// (no outbound socket, no heartbeat) so Jest unit tests never open real
+// sockets. E2E tests want the opposite: test env's sqlite db / isOffline
+// Firebase / fast sector init, but a real matchmaker-routed game creation
+// flow. JUNON_E2E_MATCHMAKER opts back into matchmaker communication while
+// keeping every other test-env behavior unchanged.
+global.isMatchmakerDisabledForTest = env === 'test' && process.env.JUNON_E2E_MATCHMAKER !== 'true'
+
 if (debugMode) {
   let nodeModulesPath = require('child_process').execSync("npm root").toString().replace("\n","")
   let protocolDirectory = nodeModulesPath + "/junon-common/protocol"
@@ -117,7 +133,10 @@ class Server {
 
   async allocatePort() {
     if (debugMode) {
-      this.APP_SERVER_PORT = process.env.PORT || 8000
+      // uws.App#listen() silently fails (falsy token, no error) when given a
+      // string port instead of a number - process.env.PORT is always a
+      // string, so this must be parsed rather than used as-is
+      this.APP_SERVER_PORT = parseInt(process.env.PORT) || 8000
     } else {
       let availablePort = await FirebaseAdminHelper.claimFreePort(this.getNodeName())
       this.APP_SERVER_PORT = await getPort({host: '0.0.0.0', port: availablePort })
@@ -125,6 +144,18 @@ class Server {
   }
 
   async run() {
+    if (env === 'test') {
+      // sqlite :memory: (see junon-common/db/config.js) starts with no schema
+      // at all - real MySQL gets its schema from db/migrations, which never
+      // runs against the in-memory db, so any real query would 404 on a
+      // missing table instead of just returning no rows.
+      // sequelize.sync() (global, association-aware) fails here with a
+      // "cyclic dependency" toposort error over the sectors<->users FK loop;
+      // syncing each already-required model independently sidesteps that
+      // since sqlite doesn't enforce FK target existence at CREATE TABLE time
+      await Promise.all(Object.values(sequelize.models).map((model) => model.sync()))
+    }
+
     this.fetchServerInfo()
 
     if (!this.REGION) {
@@ -227,9 +258,7 @@ class Server {
   initExceptionReporter() {
     ExceptionReporter.init(process.env["JUNON_SERVER_SENTRY_DSN"])
 
-    Sentry.configureScope(scope => {
-      scope.setExtra('host', this.getHost())
-    })
+    Sentry.getCurrentScope().setExtra('host', this.getHost())
   }
 
   getSystemdServiceIndex() {
@@ -400,7 +429,7 @@ class Server {
   }
 
   sendServerInfoToMatchmaker() {
-    if (env === 'test') return
+    if (global.isMatchmakerDisabledForTest) return
 
     this.sendToMatchmaker({ event: "ServerUpdated", data: this.getServerData() })
   }
@@ -777,7 +806,7 @@ class Server {
   }
 
   initMatchmakerClient() {
-    if (env === 'test') return
+    if (global.isMatchmakerDisabledForTest) return
 
     let url = Config[env].matchmakerGameServerWebsocketUrl
 
@@ -1098,7 +1127,7 @@ class Server {
   }
 
   sendToMatchmaker(data) {
-    if (env === 'test') return
+    if (global.isMatchmakerDisabledForTest) return
 
     let socket = this.getMatchmakerSocket()
     if (socket.readyState !== WebSocket.OPEN) return
@@ -1127,7 +1156,22 @@ class Server {
     app.ws("/*", {
       maxPayloadLength: 16 * 1024 * 1024,
       idleTimeout: 120,
-      open: (ws, req) => {
+      upgrade: (res, req, context) => {
+        // ws.getRemoteAddress() is unreliable on this uWebSockets.js build -
+        // it returns an empty ArrayBuffer even when called synchronously in
+        // `open`, verified against v20.70.0. The HttpResponse's
+        // getRemoteAddress() still works correctly here, pre-upgrade, so
+        // capture it now and hand it to the WebSocket as user data; uWS
+        // merges that object's properties directly onto the resulting `ws`.
+        res.upgrade(
+          { remoteAddress: Helper.getSocketRemoteAddress(res) },
+          req.getHeader('sec-websocket-key'),
+          req.getHeader('sec-websocket-protocol'),
+          req.getHeader('sec-websocket-extensions'),
+          context
+        )
+      },
+      open: (ws) => {
         this.socketUtil.registerSocket(ws)
       },
       message: (ws, message, isBinary) => {

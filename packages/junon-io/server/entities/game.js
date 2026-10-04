@@ -70,10 +70,9 @@ class Game {
       this.sectorModel = sectorData.sectorModel
     }
 
-    Sentry.configureScope(scope => {
-      scope.setExtra('sectorUid', this.sectorUid)
-      scope.setExtra('host', this.server.getHost())
-    })
+    let scope = Sentry.getCurrentScope()
+    scope.setExtra('sectorUid', this.sectorUid)
+    scope.setExtra('host', this.server.getHost())
 
     this.isTutorial = sectorData.isTutorial
 
@@ -1862,7 +1861,7 @@ class Game {
   }
 
   sendSectorInfoToMatchmaker() {
-    if (env === 'test') return
+    if (global.isMatchmakerDisabledForTest) return
     if (this.isRemoved) return
 
     this.sendToMatchmaker({ event: "SectorUpdated", data: this.getSectorData() })
